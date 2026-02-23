@@ -94,3 +94,15 @@
     --color-black: 255 0% 0%;
   }
 }
+
+/* Runner: row slide-in animation */
+@keyframes runner-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

@@ -1,0 +1,16 @@
+[package]
+name = "yaak-runner"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+chrono = { workspace = true, features = ["serde"] }
+futures = "0.3"
+log = { workspace = true }
+rusqlite = { version = "0.32.1" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt", "time", "sync"] }
+yaak-models = { workspace = true }

@@ -10129,6 +10129,7 @@ dependencies = [
  "yaak-mac-window",
  "yaak-models",
  "yaak-plugins",
+ "yaak-runner",
  "yaak-sse",
  "yaak-sync",
  "yaak-tauri-utils",
@@ -10373,6 +10374,21 @@ dependencies = [
  "yaak-models",
  "yaak-templates",
  "zip-extract",
+]
+
+[[package]]
+name = "yaak-runner"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "futures",
+ "log 0.4.29",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "tokio",
+ "yaak-models",
 ]
 
 [[package]]

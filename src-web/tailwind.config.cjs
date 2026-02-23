@@ -15,6 +15,7 @@ module.exports = {
     './*.{html,ts,tsx}',
     './commands/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
+    './features/**/*.{ts,tsx}',
     './hooks/**/*.{ts,tsx}',
     './init/**/*.{ts,tsx}',
     './lib/**/*.{ts,tsx}',
