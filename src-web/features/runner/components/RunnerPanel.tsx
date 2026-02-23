@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRunner } from '../hooks/useRunner';
 import { useRunnerConfig } from '../hooks/useRunnerConfig';
 import { useRunHistory } from '../hooks/useRunHistory';
@@ -23,13 +23,11 @@ export function RunnerPanel({ workspaceId, requestIds = [] }: Props) {
   const config = useRunnerConfig(workspaceId);
   const { history, loading: historyLoading, refresh: refreshHistory } = useRunHistory(workspaceId);
 
-  // Sync request IDs from caller into the config form
-  if (
-    requestIds.length > 0 &&
-    JSON.stringify(config.form.requestIds) !== JSON.stringify(requestIds)
-  ) {
+  // Sync incoming request IDs into the config form
+  useEffect(() => {
     config.setRequestIds(requestIds);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestIds.join(',')]);
 
   async function handleStart() {
     const runConfig = config.buildConfig();

@@ -20,6 +20,8 @@ pub async fn run_load(
     };
 
     let run_id = config.id.clone();
+    let workspace_id = config.workspace_id.clone();
+    let started_at = Utc::now().timestamp_millis();
     let request_ids = Arc::new(config.request_ids.clone());
 
     let ramp_interval_ms = if virtual_users > 0 && ramp_up_secs > 0 {
@@ -64,7 +66,7 @@ pub async fn run_load(
     futures::future::join_all(handles).await;
 
     let summary = RunSummary::compute(run_id.clone(), &all_results);
-    let _ = store.save_run(&summary, &all_results);
+    let _ = store.save_run(&summary, &all_results, &workspace_id, started_at);
     summary
 }
 

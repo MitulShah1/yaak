@@ -12,12 +12,21 @@ impl RunnerStore {
     }
 
     /// Persist a completed run summary and its individual results.
-    pub fn save_run(&self, summary: &RunSummary, results: &[RunResult]) -> Result<(), String> {
+    /// `workspace_id` and `started_at` are passed explicitly because `RunSummary`
+    /// does not carry them.
+    pub fn save_run(
+        &self,
+        summary: &RunSummary,
+        results: &[RunResult],
+        workspace_id: &str,
+        started_at: i64,
+    ) -> Result<(), String> {
         let summary_json =
             serde_json::to_string(summary).map_err(|e| format!("serialize summary: {e}"))?;
 
         let summary_run_id = summary.run_id.clone();
-        let now = chrono::Utc::now().timestamp_millis();
+        let workspace_id = workspace_id.to_string();
+        let completed_at = chrono::Utc::now().timestamp_millis();
 
         self.db.with_raw_conn(|conn| {
             conn.execute(
@@ -28,7 +37,7 @@ impl RunnerStore {
                     completed_at = excluded.completed_at,
                     summary      = excluded.summary
                 "#,
-                rusqlite::params![summary_run_id, "", 0_i64, now, summary_json],
+                rusqlite::params![summary_run_id, workspace_id, started_at, completed_at, summary_json],
             )
         })
         .map_err(|e| format!("insert runner_run: {e}"))?;

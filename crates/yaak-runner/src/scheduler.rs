@@ -49,9 +49,11 @@ pub fn start_scheduler(store: Arc<RunnerStore>) -> mpsc::Sender<()> {
     stop_tx
 }
 
-/// Check if a `ScheduleConfig` is due based on a simple cron-like check.
-/// For now returns true for configs that have `enabled = true`.
-/// A full implementation would parse the cron expression.
+/// Check if a `ScheduleConfig` is due based on a simple enabled check.
+/// NOTE: Full cron expression parsing is not yet implemented. Currently, any
+/// enabled schedule is considered due on every scheduler tick (every 60s).
+/// A production implementation should parse `schedule.cron` to determine
+/// the actual next-run time and compare against the current time.
 pub fn is_schedule_due(schedule: &ScheduleConfig) -> bool {
     schedule.enabled
 }

@@ -20,6 +20,8 @@ pub async fn run_collection(
     };
 
     let run_id = config.id.clone();
+    let workspace_id = config.workspace_id.clone();
+    let started_at = Utc::now().timestamp_millis();
     let mut results: Vec<RunResult> = Vec::new();
 
     'outer: for _iteration in 0..iterations {
@@ -43,7 +45,7 @@ pub async fn run_collection(
     }
 
     let summary = RunSummary::compute(run_id.clone(), &results);
-    let _ = store.save_run(&summary, &results);
+    let _ = store.save_run(&summary, &results, &workspace_id, started_at);
     summary
 }
 
