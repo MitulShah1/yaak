@@ -47,6 +47,21 @@ impl QueryManager {
         func(&db_context)
     }
 
+    /// Execute arbitrary SQL using a raw connection from the pool.
+    /// Use this for non-model queries (e.g. runner-specific tables).
+    pub fn with_raw_conn<F, T>(&self, func: F) -> T
+    where
+        F: FnOnce(&rusqlite::Connection) -> T,
+    {
+        let conn = self
+            .pool
+            .lock()
+            .expect("Failed to gain lock on DB for raw connection")
+            .get()
+            .expect("Failed to get new DB connection from the pool");
+        func(&conn)
+    }
+
     pub fn with_tx<T, E>(
         &self,
         func: impl FnOnce(&DbContext) -> std::result::Result<T, E>,

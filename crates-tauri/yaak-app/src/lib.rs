@@ -74,6 +74,7 @@ mod notifications;
 mod plugin_events;
 mod plugins_ext;
 mod render;
+mod runner_commands;
 mod sync_ext;
 mod updates;
 mod uri_scheme;
@@ -1614,6 +1615,9 @@ pub fn run() {
             let ws_manager = yaak_ws::WebsocketManager::new();
             app.manage(Mutex::new(ws_manager));
 
+            // Add Runner state
+            app.manage(runner_commands::RunnerState::new());
+
             // Specific settings
             let settings = app.db().get_settings();
             app.app_handle().set_native_titlebar(settings.use_native_titlebar);
@@ -1732,6 +1736,12 @@ pub fn run() {
             ws_ext::cmd_ws_send,
             ws_ext::cmd_ws_close,
             ws_ext::cmd_ws_connect,
+            //
+            // Runner commands
+            runner_commands::cmd_runner_start_collection,
+            runner_commands::cmd_runner_start_load,
+            runner_commands::cmd_runner_cancel,
+            runner_commands::cmd_runner_get_history,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
