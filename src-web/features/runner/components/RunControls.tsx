@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { CollectionConfig, LoadConfig, RunResult } from '../types';
 import type { RunnerMode } from '../hooks/useRunnerConfig';
 
@@ -25,23 +26,28 @@ export function RunControls({
   onStart,
   onCancel,
 }: Props) {
-  // Compute live stats for load runner
-  const errorRate =
-    liveResults.length > 0
-      ? Math.round(((liveResults.filter((r) => !r.success).length) / liveResults.length) * 100)
-      : 0;
-  const avgMs =
-    liveResults.length > 0
-      ? Math.round(liveResults.reduce((s, r) => s + r.durationMs, 0) / liveResults.length)
-      : 0;
-  // Compute req/s over last 5s window
-  const now = Date.now();
-  const recentResults = liveResults.filter((r) => now - r.timestamp < 5000);
-  const rps = recentResults.length / 5;
-
-  // Sparkline data: last 20 avg latency buckets (1s each)
-  const latencySparkline = computeLatencySparkline(liveResults);
-  const rpsSparkline = computeRpsSparkline(liveResults);
+  // Compute live stats for load runner — memoized to avoid recomputing on every render
+  const { errorRate, avgMs, rps, latencySparkline, rpsSparkline } = useMemo(() => {
+    if (liveResults.length === 0) {
+      return { errorRate: 0, avgMs: 0, rps: 0, latencySparkline: [], rpsSparkline: [] };
+    }
+    const errorRate = Math.round(
+      (liveResults.filter((r) => !r.success).length / liveResults.length) * 100,
+    );
+    const avgMs = Math.round(
+      liveResults.reduce((s, r) => s + r.durationMs, 0) / liveResults.length,
+    );
+    const now = Date.now();
+    const recentCount = liveResults.filter((r) => now - r.timestamp < 5000).length;
+    const rps = recentCount / 5;
+    return {
+      errorRate,
+      avgMs,
+      rps,
+      latencySparkline: computeLatencySparkline(liveResults),
+      rpsSparkline: computeRpsSparkline(liveResults),
+    };
+  }, [liveResults]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -239,7 +245,7 @@ function computeLatencySparkline(results: RunResult[]): number[] {
     if (!buckets[idx]) buckets[idx] = [];
     buckets[idx].push(r.durationMs);
   }
-  return buckets.map((b) => (b ? b.reduce((s, v) => s + v, 0) / b.length : 0));
+  return buckets.map((b) => (b && b.length > 0 ? b.reduce((s, v) => s + v, 0) / b.length : 0));
 }
 
 /** Bucket live results by 1-second windows, returning count per window. */

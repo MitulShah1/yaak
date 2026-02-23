@@ -16,7 +16,7 @@ const PRESETS: Array<{ label: string; cron: string; description: string }> = [
   { label: 'Custom', cron: '', description: '' },
 ];
 
-function describeSimpleCron(cron: string): string {
+function getCronDescription(cron: string): string {
   for (const p of PRESETS) {
     if (p.cron === cron && p.description) return p.description;
   }
@@ -48,7 +48,7 @@ export function ScheduleEditor({ schedule, onChange }: Props) {
     onChange({ cron: preset.cron });
   }
 
-  const humanReadable = schedule.cron ? describeSimpleCron(schedule.cron) : '—';
+  const humanReadable = schedule.cron ? getCronDescription(schedule.cron) : '—';
   const matchesPreset = PRESETS.find((p) => p.cron === schedule.cron && p.label !== 'Custom');
 
   return (
